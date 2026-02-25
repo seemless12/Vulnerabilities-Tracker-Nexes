@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: vuln-dashboard
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    envVars:
+      - key: MONGODB_URI
+        sync: false   # Set this in the Render dashboard — do NOT hardcode here
+      - key: OPENROUTER_API_KEY
+        sync: false   # Set this in the Render dashboard — do NOT hardcode here
+      - key: SECRET_KEY
+        generateValue: true  # Render auto-generates a secure random value

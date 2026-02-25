@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Vulnerability Dashboard</title>
+    <!-- Inter Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Custom Style -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+
+    <!-- ─── AUTHENTICATION PAGE ────────────────────────────────── -->
+    <div id="authPage">
+        <div class="auth-card">
+            <header class="auth-header">
+                <i data-lucide="shield-check"></i>
+                <h1>Cyber AI Dash</h1>
+                <p style="color:var(--text-secondary); font-size: 0.9rem; margin-top: 0.5rem;">Vulnerability
+                    Intelligence Dashboard</p>
+            </header>
+
+            <div class="auth-toggle">
+                <button id="toggleLoginBtn" class="active" onclick="showAuthMode('login')">Sign In</button>
+                <button id="toggleRegisterBtn" onclick="showAuthMode('register')">Register</button>
+            </div>
+
+            <!-- Login Form -->
+            <form id="loginForm" onsubmit="handleLogin(event)">
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="loginEmail" placeholder="name@company.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="loginPassword" placeholder="••••••••" required>
+                </div>
+                <button type="submit" id="loginBtn" class="btn-large">Sign In</button>
+                <p id="loginError" class="error-msg"></p>
+            </form>
+
+            <!-- Register Form -->
+            <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="regName" placeholder="John Doe" required>
+                </div>
+                <div class="form-group">
+                    <label>Email Address</label>
+                    <input type="email" id="regEmail" placeholder="name@company.com" required>
+                </div>
+                <div class="form-group">
+                    <label>Password</label>
+                    <input type="password" id="regPassword" placeholder="Minimum 8 characters" required>
+                </div>
+                <button type="submit" id="regBtn" class="btn-large">Create Account</button>
+                <p id="regError" class="error-msg"></p>
+            </form>
+        </div>
+    </div>
+
+    <!-- ─── DASHBOARD PAGE ────────────────────────────────────── -->
+    <div id="dashboardPage" class="hidden">
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-brand">
+                <i data-lucide="shield-alert" style="color:var(--accent)"></i>
+                <span>Cyber AI Dash</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-link active" data-page="dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Overview</span>
+                </a>
+                <a href="#" class="nav-link" data-page="assets">
+                    <i data-lucide="server"></i>
+                    <span>Assets</span>
+                </a>
+                <a href="#" class="nav-link" data-page="vulnerabilities">
+                    <i data-lucide="alert-triangle"></i>
+                    <span>Threats</span>
+                </a>
+                <a href="#" class="nav-link" data-page="ai-insights">
+                    <i data-lucide="sparkles"></i>
+                    <span>AI Insights</span>
+                </a>
+                <a href="#" class="nav-link" data-page="kb">
+                    <i data-lucide="book-open"></i>
+                    <span>Knowledge Base</span>
+                </a>
+                <a href="#" class="nav-link" data-page="chat">
+                    <i data-lucide="message-square"></i>
+                    <span>AI Chat</span>
+                </a>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="nav-link" style="padding: 0.85rem 0.5rem; margin-bottom: 0.5rem;">
+                    <i data-lucide="user-circle"></i>
+                    <span id="userName">User</span>
+                </div>
+                <a href="#" class="nav-link" onclick="logout()" style="color:var(--critical)">
+                    <i data-lucide="log-out"></i>
+                    <span>Sign Out</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+
+            <!-- Dynamic Page Content -->
+
+            <!-- PAGE: DASHBOARD OVERVIEW -->
+            <div id="page-dashboard" class="page active">
+                <header style="margin-bottom: 2.5rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 800;">Security Overview</h2>
+                    <p style="color:var(--text-secondary)">Real-time vulnerability metrics and AI analysis</p>
+                </header>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div>
+                            <p class="label">Total Assets</p>
+                            <p class="value" id="statAssets">0</p>
+                        </div>
+                        <i data-lucide="layers" style="color:var(--blue)"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="label">Vulnerabilities</p>
+                            <p class="value" id="statVulns">0</p>
+                        </div>
+                        <i data-lucide="shield-alert" style="color:var(--high)"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="label">Critical</p>
+                            <p class="value" id="statCritical">0</p>
+                        </div>
+                        <i data-lucide="alert-octagon" style="color:var(--critical)"></i>
+                    </div>
+                    <div class="stat-card">
+                        <div>
+                            <p class="label">Risk Score</p>
+                            <p class="value" id="statRisk">0.0</p>
+                        </div>
+                        <i data-lucide="activity" style="color:var(--accent)"></i>
+                    </div>
+                </div>
+
+                <div class="ai-insights-grid" style="grid-template-columns: 8fr 4fr; margin-bottom: 2rem;">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Top Threats</h3>
+                            <i data-lucide="list"></i>
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Vulnerability</th>
+                                        <th>Asset</th>
+                                        <th>Score</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="topVulnsBody">
+                                    <tr>
+                                        <td colspan="4"
+                                            style="text-align:center; padding: 2rem; color:var(--text-muted)">Loading
+                                            analysis...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card" style="background: rgba(34, 197, 94, 0.05); border-color: var(--border-active);">
+                        <div class="card-header">
+                            <h3 class="card-title">AI Summary</h3>
+                            <i data-lucide="sparkles" style="color:var(--accent)"></i>
+                        </div>
+                        <div id="aiAnalysis">
+                            <p style="color:var(--text-secondary); font-size: 0.9rem;">Initializing AI engine...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Vulnerability Trends</h3>
+                        <i data-lucide="trending-up"></i>
+                    </div>
+                    <div style="height: 300px;">
+                        <canvas id="trendsChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: ASSETS -->
+            <div id="page-assets" class="page">
+                <header
+                    style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h2 style="font-size: 1.5rem; font-weight: 800;">Asset Inventory</h2>
+                        <p style="color:var(--text-secondary)">Manage and monitor your infrastructure</p>
+                    </div>
+                    <button class="btn-large" onclick="toggleAddAsset()"
+                        style="width: auto; padding: 0.6rem 1.25rem; font-size: 0.9rem;">+ Add Asset</button>
+                </header>
+
+                <div id="addAssetForm" class="card hidden">
+                    <form onsubmit="handleAddAsset(event)">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                            <div class="form-group">
+                                <label>Asset Name</label>
+                                <input type="text" id="assetName" placeholder="e.g. Production DB" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Asset Type</label>
+                                <select id="assetType" required
+                                    style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border); color: #fff;">
+                                    <option value="Infrastructure">Infrastructure</option>
+                                    <option value="Database">Database</option>
+                                    <option value="Web Server">Web Server</option>
+                                    <option value="Cloud Service">Cloud Service</option>
+                                    <option value="Internal Tool">Internal Tool</option>
+                                </select>
+                            </div>
+                        </div>
+                        <button type="submit" id="addAssetBtn" class="btn-large"
+                            style="width: auto; padding: 0.75rem 2rem;">Save & Analyze</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Asset Name</th>
+                                    <th>Type</th>
+                                    <th>Risk Level</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="assetsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: THREATS -->
+            <div id="page-vulnerabilities" class="page">
+                <header
+                    style="margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h2 style="font-size: 1.5rem; font-weight: 800;">Threat Intelligence</h2>
+                        <p style="color:var(--text-secondary)">Detected vulnerabilities across your scope</p>
+                    </div>
+                    <div style="display: flex; gap: 1rem;">
+                        <select id="vulnSevFilter" onchange="loadVulnPage()"
+                            style="background: var(--bg-surface); border: 1px solid var(--border); color: var(--text-primary); padding: 0.5rem; border-radius: 4px;">
+                            <option value="">All Severities</option>
+                            <option value="Critical">Critical</option>
+                            <option value="High">High</option>
+                        </select>
+                        <button class="btn-large" onclick="toggleAddVuln()"
+                            style="width: auto; padding: 0.6rem 1.25rem; font-size: 0.9rem;">Report Threat</button>
+                    </div>
+                </header>
+
+                <div id="addVulnForm" class="card hidden">
+                    <form onsubmit="handleAddVuln(event)">
+                        <div class="form-group">
+                            <label>Contextual Asset</label>
+                            <select id="vulnAssetId" required
+                                style="width: 100%; padding: 0.8rem; background: var(--bg-deep); border: 1px solid var(--border); color: #fff;"></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Vulnerability Title</label>
+                            <input type="text" id="vulnTitle" required>
+                        </div>
+                        <div class="form-group">
+                            <label>Detailed Description</label>
+                            <textarea id="vulnDescription" required
+                                style="width:100%; height: 100px; background: var(--bg-deep); border: 1px solid var(--border); color: #fff; padding: 1rem;"></textarea>
+                        </div>
+                        <button type="submit" id="addVulnBtn" class="btn-large"
+                            style="width: auto; padding: 0.75rem 2rem;">Analyze with AI</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Vulnerability</th>
+                                    <th>Severity</th>
+                                    <th>Score</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vulnsTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE: AI INSIGHTS -->
+            <div id="page-ai-insights" class="page">
+                <header style="margin-bottom: 2.5rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 800;">Executive Strategy</h2>
+                    <p style="color:var(--text-secondary)">AI-generated security posture and remediation roadmap</p>
+                </header>
+
+                <div class="ai-insights-grid">
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Security Posture</h3>
+                            <i data-lucide="activity"></i>
+                        </div>
+                        <div id="securityPosture"></div>
+                    </div>
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">Urgent Recommendations</h3>
+                            <i data-lucide="check-circle"></i>
+                        </div>
+                        <div id="reportRecommendations"></div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Remediation Roadmap</h3>
+                        <i data-lucide="calendar"></i>
+                    </div>
+                    <div id="remediationRoadmap"></div>
+                </div>
+            </div>
+
+            <!-- PAGE: KNOWLEDGE BASE -->
+            <div id="page-kb" class="page">
+                <header
+                    style="margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: flex-end;">
+                    <div>
+                        <h2 style="font-size: 1.5rem; font-weight: 800;">Vulnerability Knowledge Base</h2>
+                        <p style="color:var(--text-secondary)">Expert database of remediation strategies and indicators
+                        </p>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="kbSearchInput" placeholder="Search vulnerabilities..."
+                            oninput="filterKB()"
+                            style="background: var(--bg-surface); border: 1px solid var(--border); color: #fff; padding: 0.6rem 1rem; border-radius: 6px; min-width: 250px;">
+                    </div>
+                </header>
+
+                <div id="kbGrid" class="stats-grid"
+                    style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem;">
+                    <!-- KB Cards will be injected here -->
+                </div>
+
+                <div id="kbDetailView" class="card hidden" style="margin-top: 2rem;">
+                    <div class="card-header">
+                        <h3 id="kbDetailName" class="card-title">Vulnerability Detail</h3>
+                        <button class="btn-small" onclick="closeKBDetail()"
+                            style="background:transparent; border:none; color:var(--text-muted); cursor:pointer;">
+                            <i data-lucide="x"></i>
+                        </button>
+                    </div>
+                    <div id="kbDetailContent" class="kb-detail-body"></div>
+                </div>
+            </div>
+
+            <!-- PAGE: AI CHAT -->
+            <div id="page-chat" class="page">
+                <header style="margin-bottom: 2rem;">
+                    <h2 style="font-size: 1.5rem; font-weight: 800;">Cyber AI Assistant</h2>
+                    <p style="color:var(--text-secondary)">Real-time security consultation powered by LLMs</p>
+                </header>
+
+                <div class="chat-container card">
+                    <div id="chatMessages" class="chat-messages">
+                        <div class="ai-msg">
+                            <div class="msg-bubble">
+                                Hello! I'm your Cyber AI Assistant. How can I help you with your security scope today?
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" id="chatInput" placeholder="Type your security query..."
+                            onkeypress="handleChatKey(event)">
+                        <button id="sendChatBtn" onclick="sendChatMessage()">
+                            <i data-lucide="send"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="app.js"></script>
+    <script>
+        // Initialize icons
+        lucide.createIcons();
+    </script>
+</body>
+
+</html>
